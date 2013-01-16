@@ -1,5 +1,7 @@
-# Here is the game logic
+# encoding: utf-8
+# require "debugger"
 
+# Here is the game logic
 class Game
   attr_accessor :board
 
@@ -30,12 +32,13 @@ class Board
 
   def initialize
     @chess_board = create_board
+    populate_board
   end
 
   def pretty_print
     @chess_board.each do |row|
       puts "|" + row.join("   ") + "|"
-      puts "-----------------------"
+      puts "-----------------------♔♛"
     end
   end
 
@@ -46,6 +49,34 @@ class Board
     end
     board
   end
+
+  def populate_board
+    # debugger
+    # black pawns
+    @chess_board[1].each_with_index do |cell, i|
+      piece_at(1, i, Pawn.new(:black))
+    end
+    # white pawns
+    @chess_board[6].each_with_index do |cell, i|
+      piece_at(6, i, Pawn.new(:white))
+    end
+    #black rooks
+    piece_at(0,0, Rook.new(:black))
+    piece_at(0,7, Rook.new(:black))
+    #white rooks
+    piece_at(7,0, Rook.new(:white))
+    piece_at(7,7, Rook.new(:white))
+
+  end
+
+  def piece_at(row, col, value = nil)
+    unless value == nil
+      @chess_board[row][col] = value
+    else
+      @chess_board[row][col]
+    end
+  end
+
 end
 
 class Player
@@ -60,13 +91,37 @@ end
 
 # Here are the Pieces
 class Piece
+  ICONS = {
+    :white => {
+      king: "♔",
+      queen: "♕",
+      rook: "♖",
+      bishop: "♗",
+      knight: "♘",
+      pawn: "♙"
+    },
+    :black => {
+      king: "♚",
+      queen: "♛",
+      rook: "♜",
+      bishop: "♝",
+      knight: "♞",
+      pawn: "♟"
+    }
+  }
+
+  attr_accessor :color, :symbol
+
+  def initialize(color)
+    @color = color
+  end
+
   def can_check?
 
   end
 end
 
 class Knight < Piece
-
 end
 
 class King < Piece
