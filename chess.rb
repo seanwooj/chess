@@ -51,7 +51,6 @@ class Board
   end
 
   def populate_board
-    # debugger
     # black pawns
     @chess_board[1].each_with_index do |cell, i|
       piece_at(1, i, Pawn.new(:black))
@@ -66,7 +65,24 @@ class Board
     #white rooks
     piece_at(7,0, Rook.new(:white))
     piece_at(7,7, Rook.new(:white))
-
+    #black knights
+    piece_at(0,1, Knight.new(:black))
+    piece_at(0,6, Knight.new(:black))
+    #white knights
+    piece_at(7,1, Knight.new(:white))
+    piece_at(7,6, Knight.new(:white))
+    #black bishops
+    piece_at(0,2, Bishop.new(:black))
+    piece_at(0,5, Bishop.new(:black))
+    #white bishops
+    piece_at(7,2, Bishop.new(:white))
+    piece_at(7,5, Bishop.new(:white))
+    #black royals
+    piece_at(0,3, Queen.new(:black))
+    piece_at(0,4, King.new(:black))
+    #white royals
+    piece_at(7,3, Queen.new(:white))
+    piece_at(7,4, King.new(:white))
   end
 
   def piece_at(row, col, value = nil)
@@ -110,18 +126,26 @@ class Piece
     }
   }
 
-  attr_accessor :color, :symbol
+  attr_accessor :color, :icon
 
   def initialize(color)
     @color = color
+    # This ugly bit of code assigns icons to each class automatically
+    @icon = ICONS[color][self.class.to_s.downcase.to_sym]
   end
 
   def can_check?
 
   end
+
+  def move
+
+  end
+
 end
 
 class Knight < Piece
+  
 end
 
 class King < Piece
