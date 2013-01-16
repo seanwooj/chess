@@ -34,11 +34,34 @@ class Game
 
   end
 
-  def move(source_row, source_col, target_row, target_col)
+  def change_position(source_row, source_col, target_row, target_col)
     moving_piece = @board.piece_at(source_row, source_col)
     @board.piece_at(target_row,target_col,moving_piece)
     @board.piece_at(source_row,source_col,:blank)
     @board.pretty_print #debug
+    update_piece
+  end
+
+  def update_piece
+
+  end
+
+  def move(source_row, source_col, target_row, target_col)
+    # IF there's a piece
+    if @board.piece_at(target_row,target_col).is_a?(Piece)
+      piece = take_piece(target_row,target_col)
+      # Save piece to somewhere -- going to be a player array
+      # snatch(piece)
+    end
+    # Move position
+    change_position(source_row, source_col, target_row, target_col)
+  end
+
+  def take_piece(target_row,target_col)
+    target_piece = @board.piece_at(target_row,target_col)
+    #removes the piece
+    @board.piece_at(target_row,target_col, :blank)
+    target_piece
   end
 end
 
@@ -80,41 +103,42 @@ class Board
   def populate_board
     # black pawns
     @grid[1].each_with_index do |cell, i|
-      piece_at(1, i, Pawn.new(:black))
+      piece_at(1, i, Pawn.new(:black, self))
     end
     # white pawns
     @grid[6].each_with_index do |cell, i|
-      piece_at(6, i, Pawn.new(:white))
+      piece_at(6, i, Pawn.new(:white, self))
     end
     #black rooks
-    piece_at(0,0, Rook.new(:black))
-    piece_at(0,7, Rook.new(:black))
+    piece_at(0,0, Rook.new(:black, self))
+    piece_at(0,7, Rook.new(:black, self))
     #white rooks
-    piece_at(7,0, Rook.new(:white))
-    piece_at(7,7, Rook.new(:white))
+    piece_at(7,0, Rook.new(:white, self))
+    piece_at(7,7, Rook.new(:white, self))
     #black knights
-    piece_at(0,1, Knight.new(:black))
-    piece_at(0,6, Knight.new(:black))
+    piece_at(0,1, Knight.new(:black, self))
+    piece_at(0,6, Knight.new(:black, self))
     #white knights
-    piece_at(7,1, Knight.new(:white))
-    piece_at(7,6, Knight.new(:white))
+    piece_at(7,1, Knight.new(:white, self))
+    piece_at(7,6, Knight.new(:white, self))
     #black bishops
-    piece_at(0,2, Bishop.new(:black))
-    piece_at(0,5, Bishop.new(:black))
+    piece_at(0,2, Bishop.new(:black, self))
+    piece_at(0,5, Bishop.new(:black, self))
     #white bishops
-    piece_at(7,2, Bishop.new(:white))
-    piece_at(7,5, Bishop.new(:white))
+    piece_at(7,2, Bishop.new(:white, self))
+    piece_at(7,5, Bishop.new(:white, self))
     #black royals
-    piece_at(0,3, Queen.new(:black))
-    piece_at(0,4, King.new(:black))
+    piece_at(0,3, Queen.new(:black, self))
+    piece_at(0,4, King.new(:black, self))
     #white royals
-    piece_at(7,3, Queen.new(:white))
-    piece_at(7,4, King.new(:white))
+    piece_at(7,3, Queen.new(:white, self))
+    piece_at(7,4, King.new(:white, self))
   end
 
-  def piece_at(row, col, value = nil)
+  def piece_at(row, col, value=nil)
     unless value == nil
       @grid[row][col] = value
+      value.position(row,col) unless value == :blank
     else
       @grid[row][col]
     end
@@ -153,20 +177,27 @@ class Piece
     }
   }
 
-  attr_accessor :color, :icon
+  attr_accessor :color, :icon, :position, :board
 
-  def initialize(color)
+  def initialize(color,board)
     @color = color
     # This ugly bit of code assigns icons to each class automatically
     @icon = ICONS[color][self.class.to_s.downcase.to_sym]
+    @board = board
+  end
+
+  def position(row=nil,col=nil)
+    unless row.nil? && col.nil?
+      @position = [row,col]
+    end
+    @position
   end
 
   def can_check?
 
   end
 
-  def move
-
+  def valid_move?
   end
 
 end
@@ -176,6 +207,16 @@ class Knight < Piece
 end
 
 class King < Piece
+  POS_MOVES = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1]
+  ]
 
 end
 
