@@ -25,38 +25,65 @@ class Game
     file = File.readlines("#{saved_game}.chess").join
     YAML.load(file)
   end
+
+  def play_loop
+
+  end
+
+  def get_input
+
+  end
+
+  def move(source_row, source_col, target_row, target_col)
+    moving_piece = @board.piece_at(source_row, source_col)
+    @board.piece_at(target_row,target_col,moving_piece)
+    @board.piece_at(source_row,source_col,:blank)
+    @board.pretty_print #debug
+  end
 end
 
 class Board
-  attr_accessor :chess_board
+  attr_accessor :grid #for debugging
 
   def initialize
-    @chess_board = create_board
+    @grid = create_board
     populate_board
+    pretty_print
   end
 
   def pretty_print
-    @chess_board.each do |row|
-      puts "|" + row.join("   ") + "|"
-      puts "-----------------------♔♛"
+    puts "   A B C D E F G H"
+    puts "   ---------------"
+    @grid.each_with_index do |row, row_index|
+      print "#{row_index + 1}| "
+      row.each_with_index do |cell, col_index|
+        piece = piece_at(row_index, col_index)
+        unless piece == :blank
+          print piece.icon + " "
+        else
+          print "_ "
+        end
+      end
+      puts
     end
+    nil
   end
 
   def create_board
     board = []
     8.times do
-      board << Array.new(8)
+      board << Array.new(8, :blank)
     end
     board
   end
 
   def populate_board
     # black pawns
-    @chess_board[1].each_with_index do |cell, i|
+    @grid[1].each_with_index do |cell, i|
       piece_at(1, i, Pawn.new(:black))
     end
     # white pawns
-    @chess_board[6].each_with_index do |cell, i|
+    @grid[6].each_with_index do |cell, i|
       piece_at(6, i, Pawn.new(:white))
     end
     #black rooks
@@ -87,9 +114,9 @@ class Board
 
   def piece_at(row, col, value = nil)
     unless value == nil
-      @chess_board[row][col] = value
+      @grid[row][col] = value
     else
-      @chess_board[row][col]
+      @grid[row][col]
     end
   end
 
@@ -145,7 +172,7 @@ class Piece
 end
 
 class Knight < Piece
-  
+
 end
 
 class King < Piece
