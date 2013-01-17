@@ -9,6 +9,11 @@ class Game
     @board = Board.new
   end
 
+  # DELETE ME LATER !!!!!
+  def dprint
+    @board.pretty_print_dev
+  end
+
   def save_game
     puts "Save your game!"
     print "What do you want to save your game as? >"
@@ -39,11 +44,6 @@ class Game
     @board.piece_at(target_row,target_col,moving_piece)
     @board.piece_at(source_row,source_col,:blank)
     @board.pretty_print #debug
-    update_piece
-  end
-
-  def update_piece
-
   end
 
   def move(source_row, source_col, target_row, target_col)
@@ -71,7 +71,7 @@ class Board
   def initialize
     @grid = create_board
     populate_board
-    pretty_print
+    pretty_print_dev
   end
 
   def pretty_print
@@ -92,11 +92,27 @@ class Board
     nil
   end
 
+  def pretty_print_dev
+    puts "   0 1 2 3 4 5 6 7"
+    puts "   ---------------"
+    @grid.each_with_index do |row, row_index|
+      print "#{row_index}| "
+      row.each_with_index do |cell, col_index|
+        piece = piece_at(row_index, col_index)
+        unless piece == :blank
+          print piece.icon + " "
+        else
+          print "_ "
+        end
+      end
+      puts
+    end
+    nil
+  end
+
   def create_board
     board = []
-    8.times do
-      board << Array.new(8, :blank)
-    end
+    8.times { board << Array.new(8, :blank) }
     board
   end
 
@@ -197,13 +213,53 @@ class Piece
 
   end
 
-  def valid_move?
+  def valid_move?(target_position)
+    valid_moves.include?(target_position)
+  end
+
+  def valid_moves
+    all_moves = self.class::POS_MOVES.map do |(row,col)|
+      [@position[0] + row, @position[1] + col]
+    end
+
+    all_moves = remove_non_existant_moves(all_moves)
+    remove_team_occupied_moves(all_moves)
+  end
+
+  def remove_non_existant_moves(moves)
+    coordinates = moves.select do |(row, col)|
+      [row, col].all? do |coord|
+        (0...7).include?(coord)
+      end
+    end
+
+    coordinates
+  end
+
+  def remove_team_occupied_moves(moves)
+    moves.select do |(row, col)|
+      piece = @board.piece_at(row,col)
+      if piece == :blank || piece.color != self.color
+        true
+      else
+        false
+      end
+    end
   end
 
 end
 
 class Knight < Piece
-
+  POS_MOVES = [
+    [-2, -1],
+    [-2, 1],
+    [1, 2],
+    [1, -2],
+    [2, 1],
+    [2, -1],
+    [-1, 2],
+    [-1, -2]
+  ]
 end
 
 class King < Piece
@@ -233,7 +289,12 @@ class Bishop < Piece
 end
 
 class Pawn < Piece
-
+  POS_MOVES = [
+    [1,0],
+    [2,0],
+    [1,1],
+    [1,-1]
+  ]
 end
 
 
