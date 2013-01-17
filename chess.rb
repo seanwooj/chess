@@ -10,8 +10,13 @@ class Game
   end
 
   # DELETE ME LATER !!!!!
+  # CHEATCODEZ DEV OPTIONS
   def dprint
     @board.pretty_print_dev
+  end
+
+  def dp(row, col)
+    @board.piece_at(row, col)
   end
 
   def save_game
@@ -149,6 +154,10 @@ class Board
     #white royals
     piece_at(7,3, Queen.new(:white, self))
     piece_at(7,4, King.new(:white, self))
+
+    #test pawns
+    piece_at(3, 3, Pawn.new(:white, self))
+    piece_at(3, 4, Pawn.new(:black, self))
   end
 
   def piece_at(row, col, value=nil)
@@ -223,7 +232,7 @@ class Piece
     end
 
     all_moves = remove_non_existant_moves(all_moves)
-    remove_team_occupied_moves(all_moves)
+    all_moves = remove_team_occupied_moves(all_moves)
   end
 
   def remove_non_existant_moves(moves)
@@ -290,11 +299,33 @@ end
 
 class Pawn < Piece
   POS_MOVES = [
-    [1,0],
-    [2,0],
-    [1,1],
-    [1,-1]
+    [1,0], # black
+    [2,0], # black
+    [1,1], # black
+    [1,-1],# black
+    [-1,0], # white
+    [-2,0], # white
+    [-1,-1], # white
+    [-1,1] # white
   ]
+
+  def valid_moves
+    all_moves = super
+    if self.color == :black
+      all_moves.select! do |coords|
+        coords[0] > self.position[0]
+      end
+      all_moves
+    else # :white
+      all_moves.select! do |coords|
+        coords[0] < self.position[0]
+      end
+      all_moves
+    end
+  end
 end
 
-
+def game
+  g = Game.new
+  g
+end
