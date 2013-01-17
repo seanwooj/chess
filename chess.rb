@@ -157,6 +157,7 @@ class Board
 
     #test pawns
     piece_at(3, 3, Pawn.new(:white, self))
+    piece_at(2, 3, Pawn.new(:black, self))
     piece_at(3, 4, Pawn.new(:black, self))
   end
 
@@ -311,6 +312,12 @@ class Pawn < Piece
 
   def valid_moves
     all_moves = super
+    all_moves = filter_on_color(all_moves)
+    all_moves = filter_on_jump(all_moves)
+    all_moves = filter_when_blocked(all_moves)
+  end
+
+  def filter_on_color(all_moves)
     if self.color == :black
       all_moves.select! do |coords|
         coords[0] > self.position[0]
@@ -323,6 +330,57 @@ class Pawn < Piece
       all_moves
     end
   end
+
+  def filter_on_jump(all_moves)
+    if self.color == :black
+      unless self.position[0] == 1
+        all_moves.select! do |coords|
+          coords[0] == self.position[0] + 1
+        end
+      end
+    else
+      unless self.position[0] == 6
+        all_moves.select! do |coords|
+          coords[0] == self.position[0] - 1
+        end
+      end
+    end
+    all_moves
+  end
+
+  def filter_when_blocked(all_moves)
+    if self.color == :black
+      row, col = @position
+      if @board.piece_at(row+1, col) != :blank
+        all_moves.select! do |(r,c)|
+          c != self.position[1]
+        end
+      end
+    else
+      row, col = @position
+      if @board.piece_at(row-1, col) != :blank
+        all_moves.select! do |(r,c)|
+          c != self.position[1]
+        end
+      end
+    end
+    all_moves
+  end
+
+  def filter_on_attack(all_moves)
+    # row, col = @position
+    # if @board.piece_at(row, col+1) != :blank
+    # end
+
+    # if @board.piece_at(row, col-1) != :blank
+    # end
+
+    # all_moves.select! do |coords|
+    #   coords[0] == self.position[0] - 1
+    # end
+  end
+
+
 end
 
 def game
