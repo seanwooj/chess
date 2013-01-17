@@ -81,7 +81,7 @@ class Board
 
   def pretty_print
     puts "   A B C D E F G H"
-    puts "   ---------------"
+    puts "  ________________"
     @grid.each_with_index do |row, row_index|
       print "#{row_index + 1}| "
       row.each_with_index do |cell, col_index|
@@ -99,7 +99,7 @@ class Board
 
   def pretty_print_dev
     puts "   0 1 2 3 4 5 6 7"
-    puts "   ---------------"
+    puts "  ________________"
     @grid.each_with_index do |row, row_index|
       print "#{row_index}| "
       row.each_with_index do |cell, col_index|
